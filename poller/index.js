@@ -7,7 +7,7 @@ var Q = require('q');
 AWS.config.setPromisesDependency(Q.Promise);
 var awsRegion = process.env.AWS_REGION;
 
-var dynamo = {};
+var docClient = new AWS.DynamoDB.DocumentClient({region: awsRegion, endpoint: 'http://localhost:8000'});
 
 var soap = require('soap');
 // var url = 'https://hackathon.app.kaercher.com/soap/v18/data?wsdl';
@@ -79,7 +79,8 @@ function parseEvent(event) {
     }
   });
   res.enter = !event.risingEdge;
-  res.time = new Date(event.timestamp);
+  res.time = new Date(event.timestamp).getTime();
+  console.log('Event', res);
   return res;
 }
 
@@ -102,20 +103,51 @@ function handleSessionEvent(ctx) {
 
 
 function handleStartSession(ctx, event) {
-  dynamo[event.area] = {start: event.time};
-  console.log('Handle start', event);
-  return Q.resolve(ctx);
+  var params = {
+    TableName: 'KehrwocheEvents',
+    Item: {
+      "area": event.area,
+      "start": event.time
+    }
+  };
+  return docClient.put(params).promise().then(function (res) {
+    return ctx;
+  });
 }
 
 function handleEndSession(ctx, event) {
-  if (dynamo[event.area]) {
-    var state = dynamo[event.area];
+  var params = {
+    TableName: 'KehrwocheEvents',
+    Key: {
+      "area": event.area
+    }
+  };
+  
+  return docClient.get(params).promise().then(function (data) {
+    var state = data.Item;
+    if (!state) {
+      return ctx;
+    }
     var duration = (event.time - state.start) / 1000 / 3600;
     var cost = duration * price;
-    ctx.sessions.push({area: event.area, start: state.start, end: event.time, duration: duration, cost: cost});
-    delete dynamo[event.area];
-  }
-  return Q.resolve(ctx);
+    
+    var session = {
+      area: event.area,
+      start: new Date(state.start),
+      startTime: state.start,
+      end: new Date(event.time),
+      endTime: event.time,
+      duration: duration,
+      cost: cost
+    };
+    ctx.sessions.push(session);
+    return docClient.delete(params).promise().then(function (res) {
+      return ctx;
+    });
+  }, function (err) {
+    console.log('Error or get or delete', err);
+    return ctx;
+  });
 }
 
 function sendBilling(sessions) {
@@ -123,9 +155,9 @@ function sendBilling(sessions) {
 }
 
 exports.handler = function (event, context, callback) {
-  console.log("INFO: Poller triggered");
+  console.log("INFO: Poller triggered from start " + parseInt(event.time));
   
-  getEvents([], 0)
+  getEvents([], parseInt(event.time))
     .then(parseEvents)
     .then(handleEvents)
     .then(sendBilling)
