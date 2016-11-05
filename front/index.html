@@ -40,7 +40,7 @@
          <div class="row">
             <form class="col s12">
               <div class="row">
-                <button id="submitRequest" class="btn waves-effect waves-light" type="submit" name="action">Clean
+                <button id="submitRequest" class="btn waves-effect waves-light"  name="action">Clean
                     </button>
                   </div>
               </div>
@@ -114,18 +114,20 @@ $("#submitRequest").click(function() {
     $.ajax({
         type: 'POST',
         contentType: 'application/json',
-        url: 'https://3mo44ocomk.execute-api.eu-west-1.amazonaws.com/dev/geofence/',
+        url: 'https://3mo44ocomk.execute-api.eu-west-1.amazonaws.com/dev/geofence',
         dataType: "json",
         data: formToJSON(),
         success: function(data, textStatus, jqXHR){
             console.log('created' + data);
-            alert('Request created');
+            alert('Request created'
+                 + JSON.stringify(data));
         },
         error: function(jqXHR, textStatus, errorThrown){
              console.log('failed' +  errorThrown);
             alert('addWine error: ' + textStatus);
         }
     });
+    return false;
 });
         
         function formToJSON() {
