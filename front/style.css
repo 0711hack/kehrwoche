@@ -1,0 +1,16 @@
+nav {
+    color: #474540;
+    background-color: #ffed00;
+    width: 100%;
+    height: 56px;
+    line-height: 56px;
+}
+
+nav .brand-logo {
+    color: #474540;
+    font-size: 1.8rem;
+}
+
+nav ul a {
+    color: #474540;
+}
