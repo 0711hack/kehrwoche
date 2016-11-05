@@ -8,6 +8,7 @@
   "license": "MIT",
   "dependencies": {
     "aws-sdk": "^2.4.11",
+    "q": "^1.4.1",
     "soap": "^0.17.0"
   }
 }
