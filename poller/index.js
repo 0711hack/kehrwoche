@@ -1,7 +1,10 @@
 'use strict';
 
+var price = 40;
+
 var AWS = require('aws-sdk');
 var Q = require('q');
+AWS.config.setPromisesDependency(Q.Promise);
 var awsRegion = process.env.AWS_REGION;
 
 var soap = require('soap');
@@ -68,8 +71,56 @@ function parseEvent(event) {
       res.area = att.value;
     }
   });
-  res.enter = event.risingEdge;
+  res.enter = !event.risingEdge;
   res.time = new Date(event.timestamp);
+  return res;
+}
+
+function collectEvents(events) {
+  var res = {};
+  events.forEach(function (ev) {
+    if (!res[ev.area]) {
+      res[ev.area] = [];
+    }
+    res[ev.area].push({enter: ev.enter, time: ev.time});
+  });
+  return res;
+}
+
+function collectSessions(events) {
+  var sessions = [];
+  for (var index in events) {
+    if (events.hasOwnProperty(index)) {
+      var evs = events[index];
+      var currentSession;
+      evs.forEach(function (ev) {
+        if (ev.enter) {
+          currentSession = {id: index, start: ev.time};
+        } else {
+          if (currentSession) {
+            currentSession.end = ev.time;
+            sessions.push(currentSession);
+            currentSession = undefined;
+          }
+        }
+      });
+    }
+  }
+  return sessions;
+}
+
+function calcBilling(sessions) {
+  var res = {};
+  
+  sessions.forEach(function (session) {
+    if (!res[session.id]) {
+      res[session.id] = [];
+    }
+    var duration = (session.end - session.start) / 1000 / 3600;
+    var cost = duration * price;
+    res[session.id].push({start: session.start, end: session.end, duration: duration, cost: cost});
+  });
+  
   return res;
 }
 
@@ -78,6 +129,9 @@ exports.handler = function (event, context, callback) {
   
   getEvents([], 0)
     .then(parseEvents)
+    .then(collectEvents)
+    .then(collectSessions)
+    .then(calcBilling)
     .then(function (events) {
       callback(null, events);
     })
