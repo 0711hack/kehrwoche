@@ -18,8 +18,6 @@ var options = {
 module.exports.addGeofence = (event, context, callback) => {
 
     console.log(JSON.stringify(event));
-    //const req = JSON.parse(event.body);
-    
     
     soap.createClient(url, options, function(err, client) {
 
@@ -41,10 +39,9 @@ module.exports.addGeofence = (event, context, callback) => {
         // build xml
         var geofence = xmlbuilder.begin().ele('GeoArea', { 'GeoAreaId': '1337' });    
         req.points.forEach(function (point, i) {
-            geofence.ele('GeoLocation', { 'SequenceNr': i+1 }).ele('Latitude', point.lat).up().ele('Longtitude', point.long);
+            geofence.ele('GeoLocation', { 'SequenceNr': i+1 }).ele('Longtitude', Math.round(point.long*1000000)).up().ele('Latitude', Math.round(point.lat*1000000));
         });
-        
-        
+
         console.log(geofence.end({ pretty: true}));
 
         var args = {
@@ -53,8 +50,8 @@ module.exports.addGeofence = (event, context, callback) => {
                 attributes: {
                     "xsi:type": "tns:kaercherMachineIdentifier"
                 },
-                materialNumber: '1.999-260.0',
-                serialNumber: '000100'
+                materialNumber: '1.280-150.2',
+                serialNumber: '000116'
             },
             replacements: {
                 placeholder: "GeoFences",
@@ -65,28 +62,18 @@ module.exports.addGeofence = (event, context, callback) => {
         client.setConfigurationReplacements(args, function(err, result, raw, soapHeader) {
             if(err) { console.log(err); }
             console.log(result.return);
-        
-        
-            delete args.replacements
-        
-            client.getConfigurationReplacements(args, function(err, result, raw, soapHeader) {
-                if(err) { console.log(err); }
-                console.log(result.return);
-                
-                const response = {
-                    statusCode: 200,
-                    headers: {'Access-Control-Allow-Origin': '*'},
-                    body: JSON.stringify({
-                        message: 'Go Serverless v1.0! Your function executed successfully!',
-                        input: req,
-                    }),
-                };
-                
-                
-                callback(null, response);
-            });
-        });
 
+            const response = {
+                statusCode: 200,
+                headers: {'Access-Control-Allow-Origin': '*'},
+                body: JSON.stringify({
+                    message: 'successful',
+                    input: event
+                })
+            };
+            callback(null, response);
+
+        });
     });
 
     // const response = {
