@@ -124,6 +124,10 @@ function calcBilling(sessions) {
   return res;
 }
 
+function sendBilling(billings) {
+  return billings;
+}
+
 exports.handler = function (event, context, callback) {
   console.log("INFO: Poller triggered");
   
@@ -132,6 +136,7 @@ exports.handler = function (event, context, callback) {
     .then(collectEvents)
     .then(collectSessions)
     .then(calcBilling)
+    .then(sendBilling)
     .then(function (events) {
       callback(null, events);
     })
