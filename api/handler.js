@@ -19,6 +19,7 @@ var options = {
 
 module.exports.addGeofence = (event, context, callback) => {
 
+    // create soap client
     soap.createClient(url, options, function(err, client) {
         if(err) { console.log(err); }
 
