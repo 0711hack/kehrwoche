@@ -151,30 +151,30 @@ $("#submitRequest").click(function() {
             
             var result = {};           // Object
             result['id'] = '12345';
-            result['position'] = []; 
+            result['points'] = [];
             var ne = {};
             ne['long'] = bounds.getNorthEast().lng();
             ne['lat'] = bounds.getNorthEast().lat();
-            result['position'].push(ne);
+            result['points'].push(ne);
             // Array
             var se = {};
             se['long'] = bounds.getSouthWest().lng();
             se['lat'] = bounds.getNorthEast().lat();
             // Array
-            result['position'].push(se);
+            result['points'].push(se);
             
             
              var sw = {};
             sw['long'] = bounds.getSouthWest().lng();
             sw['lat'] = bounds.getSouthWest().lat();
             // Array
-            result['position'].push(sw);
+            result['points'].push(sw);
             
             var nw = {};
             nw['long'] = bounds.getNorthEast().lng();
             nw['lat'] = bounds.getSouthWest().lat();
             // Array
-            result['position'].push(nw);
+            result['points'].push(nw);
             console.log(JSON.stringify(result));
             return JSON.stringify(result);
         };
