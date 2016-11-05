@@ -1,0 +1,92 @@
+<?xml version='1.0' encoding='UTF-8'?><wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://getnewmachines.tdms.kaercher.com/v12/GetNewMachinesWebService" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ns1="http://schemas.xmlsoap.org/soap/http" name="GetNewMachinesWebServiceImplService" targetNamespace="http://getnewmachines.tdms.kaercher.com/v12/GetNewMachinesWebService">
+  <wsdl:types>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://getnewmachines.tdms.kaercher.com/v12/GetNewMachinesWebService" elementFormDefault="unqualified" targetNamespace="http://getnewmachines.tdms.kaercher.com/v12/GetNewMachinesWebService" version="1.0">
+
+  <xs:element name="getNewMachines" type="tns:getNewMachines"/>
+
+  <xs:element name="getNewMachinesResponse" type="tns:getNewMachinesResponse"/>
+
+  <xs:complexType name="getNewMachines">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="sinceTimestamp" nillable="true" type="xs:long"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getNewMachinesResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:newMachinesResponse"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="newMachinesResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="machines">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="unbounded" minOccurs="0" name="machines" nillable="true" type="tns:machineIdentifier"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="timestampToken" type="xs:long"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="machineIdentifier">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractDeviceIdentifier">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType abstract="true" name="abstractDeviceIdentifier">
+    <xs:sequence>
+      <xs:element name="materialNumber" type="xs:string"/>
+      <xs:element name="serialNumber" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="tcuIdentifier">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractDeviceIdentifier">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+</xs:schema>
+  </wsdl:types>
+  <wsdl:message name="getNewMachinesResponse">
+    <wsdl:part element="tns:getNewMachinesResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getNewMachines">
+    <wsdl:part element="tns:getNewMachines" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="GetNewMachinesWebService">
+    <wsdl:operation name="getNewMachines">
+      <wsdl:input message="tns:getNewMachines" name="getNewMachines">
+    </wsdl:input>
+      <wsdl:output message="tns:getNewMachinesResponse" name="getNewMachinesResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="GetNewMachinesWebServiceImplServiceSoapBinding" type="tns:GetNewMachinesWebService">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="getNewMachines">
+      <soap:operation soapAction="getNewMachines" style="document"/>
+      <wsdl:input name="getNewMachines">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getNewMachinesResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="GetNewMachinesWebServiceImplService">
+    <wsdl:port binding="tns:GetNewMachinesWebServiceImplServiceSoapBinding" name="GetNewMachinesWebServicePort">
+      <soap:address location="https://hackathon.app.kaercher.com/soap/v18/getnewmachines"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

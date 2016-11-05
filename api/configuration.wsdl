@@ -1,0 +1,93 @@
+<?xml version='1.0' encoding='UTF-8'?><wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://impl.domainconfiguration.soap.kaercher.centersight.deviceinsight.com/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ns2="http://schemas.xmlsoap.org/soap/http" xmlns:ns1="http://config.tdms.kaercher.com/DomainConfigurationWebService" name="DomainConfigurationWebServiceImplService" targetNamespace="http://impl.domainconfiguration.soap.kaercher.centersight.deviceinsight.com/">
+  <wsdl:import location="https://hackathon.app.kaercher.com/soap/v18/configuration?wsdl=DomainConfigurationWebService.wsdl" namespace="http://config.tdms.kaercher.com/DomainConfigurationWebService">
+    </wsdl:import>
+  <wsdl:binding name="DomainConfigurationWebServiceImplServiceSoapBinding" type="ns1:DomainConfigurationWebService">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="getDomainConfigurationByDomainAndMachineType">
+      <soap:operation soapAction="getDomainConfigurationByDomainAndMachineType" style="document"/>
+      <wsdl:input name="getDomainConfigurationByDomainAndMachineType">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getDomainConfigurationByDomainAndMachineTypeResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="setConfigurationReplacements">
+      <soap:operation soapAction="setConfigurationReplacements" style="document"/>
+      <wsdl:input name="setConfigurationReplacements">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="setConfigurationReplacementsResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="deleteConfigurationReplacements">
+      <soap:operation soapAction="deleteConfigurationReplacements" style="document"/>
+      <wsdl:input name="deleteConfigurationReplacements">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="deleteConfigurationReplacementsResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="listDomains">
+      <soap:operation soapAction="listDomains" style="document"/>
+      <wsdl:input name="listDomains">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="listDomainsResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="setDomainConfigurationByDomainAndProfile">
+      <soap:operation soapAction="setDomainConfigurationByDomainAndProfile" style="document"/>
+      <wsdl:input name="setDomainConfigurationByDomainAndProfile">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="setDomainConfigurationByDomainAndProfileResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getMachineConfigurationUpdateStatus">
+      <soap:operation soapAction="getMachineConfigurationUpdateStatus" style="document"/>
+      <wsdl:input name="getMachineConfigurationUpdateStatus">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getMachineConfigurationUpdateStatusResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getMachineConfigurations">
+      <soap:operation soapAction="getMachineConfigurations" style="document"/>
+      <wsdl:input name="getMachineConfigurations">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getMachineConfigurationsResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="listMachineTypes">
+      <soap:operation soapAction="listMachineTypes" style="document"/>
+      <wsdl:input name="listMachineTypes">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="listMachineTypesResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getConfigurationReplacements">
+      <soap:operation soapAction="getConfigurationReplacements" style="document"/>
+      <wsdl:input name="getConfigurationReplacements">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getConfigurationReplacementsResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="DomainConfigurationWebServiceImplService">
+    <wsdl:port binding="tns:DomainConfigurationWebServiceImplServiceSoapBinding" name="DomainConfigurationWebServiceImplPort">
+      <soap:address location="https://hackathon.app.kaercher.com/soap/v18/configuration"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

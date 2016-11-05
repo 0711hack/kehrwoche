@@ -1,0 +1,632 @@
+<?xml version='1.0' encoding='UTF-8'?><wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://query.tdms.kaercher.com" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ns1="http://schemas.xmlsoap.org/soap/http" targetNamespace="http://query.tdms.kaercher.com">
+  <wsdl:types>
+<xs:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://query.tdms.kaercher.com" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ns1="http://schemas.xmlsoap.org/soap/http" elementFormDefault="unqualified" targetNamespace="http://query.tdms.kaercher.com" version="1.0">
+
+			
+  <xs:element name="getEventById" type="tns:getEventById"/>
+
+			
+  <xs:element name="getEventByIdResponse" type="tns:getEventByIdResponse"/>
+
+			
+  <xs:element name="queryForData" type="tns:queryForData"/>
+
+			
+  <xs:element name="queryForDataResponse" type="tns:queryForDataResponse"/>
+
+			
+  <xs:element name="queryForEvents" type="tns:queryForEvents"/>
+
+			
+  <xs:element name="queryForEventsResponse" type="tns:queryForEventsResponse"/>
+
+			
+  <xs:element name="queryForLastData" type="tns:queryForLastData"/>
+
+			
+  <xs:element name="queryForLastDataResponse" type="tns:queryForLastDataResponse"/>
+
+			
+  <xs:complexType name="getEventById">
+				
+    <xs:sequence>
+					
+      <xs:element name="eventId" type="xs:long"/>
+				
+    </xs:sequence>
+			
+  </xs:complexType>
+
+			
+  <xs:complexType name="getEventByIdResponse">
+				
+    <xs:sequence>
+					
+      <xs:element minOccurs="0" name="return" type="tns:event"/>
+				
+    </xs:sequence>
+			
+  </xs:complexType>
+
+			
+  <xs:complexType name="event">
+				
+    <xs:sequence>
+					
+      <xs:element minOccurs="0" name="category" type="xs:string"/>
+					
+      <xs:element name="code" type="xs:unsignedInt"/>
+					
+      <xs:element name="eventAttributes">
+						
+        <xs:complexType>
+							
+          <xs:sequence>
+								
+            <xs:element maxOccurs="unbounded" minOccurs="0" name="entry">
+									
+              <xs:complexType>
+										
+                <xs:sequence>
+											
+                  <xs:element minOccurs="0" name="key" type="xs:string"/>
+											
+                  <xs:element minOccurs="0" name="value" type="xs:string"/>
+										
+                </xs:sequence>
+									
+              </xs:complexType>
+								
+            </xs:element>
+							
+          </xs:sequence>
+						
+        </xs:complexType>
+					
+      </xs:element>
+					
+      <xs:element minOccurs="0" name="id" type="xs:long"/>
+					
+      <xs:element name="priority" type="xs:int"/>
+					
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="referencedDatapointValues" nillable="true" type="tns:datapoint"/>
+					
+      <xs:element minOccurs="0" name="referencedEventId" type="xs:long"/>
+					
+      <xs:element name="risingEdge" type="xs:boolean"/>
+					
+      <xs:element minOccurs="0" name="timestamp" type="xs:dateTime"/>
+				
+    </xs:sequence>
+			
+  </xs:complexType>
+
+			
+  <xs:complexType name="datapoint">
+				
+    <xs:sequence>
+					
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="datapointValues" nillable="true" type="tns:datapointValue"/>
+					
+      <xs:element minOccurs="0" name="name" type="xs:string"/>
+					
+      <xs:element minOccurs="0" name="uuid" type="xs:string"/>
+				
+    </xs:sequence>
+			
+  </xs:complexType>
+
+			
+  <xs:complexType abstract="true" name="datapointValue">
+				
+    <xs:sequence>
+					
+      <xs:element minOccurs="0" name="timestamp" type="xs:dateTime"/>
+				
+    </xs:sequence>
+			
+  </xs:complexType>
+
+			
+  <xs:complexType name="decimalValue">
+				
+    <xs:complexContent>
+					
+      <xs:extension base="tns:datapointValue">
+						
+        <xs:sequence>
+							
+          <xs:element name="value" type="xs:decimal"/>
+						
+        </xs:sequence>
+					
+      </xs:extension>
+				
+    </xs:complexContent>
+			
+  </xs:complexType>
+
+			
+  <xs:complexType name="integerValue">
+				
+    <xs:complexContent>
+					
+      <xs:extension base="tns:datapointValue">
+						
+        <xs:sequence>
+							
+          <xs:element name="value" type="xs:int"/>
+						
+        </xs:sequence>
+					
+      </xs:extension>
+				
+    </xs:complexContent>
+			
+  </xs:complexType>
+
+			
+  <xs:complexType name="unsignedIntegerValue">
+				
+    <xs:complexContent>
+					
+      <xs:extension base="tns:datapointValue">
+						
+        <xs:sequence>
+							
+          <xs:element name="value" type="xs:unsignedInt"/>
+						
+        </xs:sequence>
+					
+      </xs:extension>
+				
+    </xs:complexContent>
+			
+  </xs:complexType>
+
+			
+  <xs:complexType name="booleanValue">
+				
+    <xs:complexContent>
+					
+      <xs:extension base="tns:datapointValue">
+						
+        <xs:sequence>
+							
+          <xs:element name="value" type="xs:boolean"/>
+						
+        </xs:sequence>
+					
+      </xs:extension>
+				
+    </xs:complexContent>
+			
+  </xs:complexType>
+
+			
+  <xs:complexType name="gpsValue">
+				
+    <xs:complexContent>
+					
+      <xs:extension base="tns:datapointValue">
+						
+        <xs:sequence>
+							
+          <xs:element minOccurs="0" name="altitude" type="xs:decimal"/>
+							
+          <xs:element minOccurs="0" name="hdop" type="xs:decimal"/>
+							
+          <xs:element minOccurs="0" name="latitude" type="xs:decimal"/>
+							
+          <xs:element minOccurs="0" name="longitude" type="xs:decimal"/>
+							
+          <xs:element minOccurs="0" name="vdop" type="xs:decimal"/>
+						
+        </xs:sequence>
+					
+      </xs:extension>
+				
+    </xs:complexContent>
+			
+  </xs:complexType>
+
+			
+  <xs:complexType name="acqPosV2Value">
+				
+    <xs:complexContent>
+					
+      <xs:extension base="tns:datapointValue">
+						
+        <xs:sequence>
+							
+          <xs:element minOccurs="0" name="altitude" type="xs:decimal"/>
+							
+          <xs:element minOccurs="0" name="hdev" type="xs:decimal"/>
+							
+          <xs:element minOccurs="0" name="latitude" type="xs:decimal"/>
+							
+          <xs:element minOccurs="0" name="longitude" type="xs:decimal"/>
+							
+          <xs:element minOccurs="0" name="vdev" type="xs:decimal"/>
+						
+        </xs:sequence>
+					
+      </xs:extension>
+				
+    </xs:complexContent>
+			
+  </xs:complexType>
+
+			
+  <xs:complexType name="stringValue">
+				
+    <xs:complexContent>
+					
+      <xs:extension base="tns:datapointValue">
+						
+        <xs:sequence>
+							
+          <xs:element minOccurs="0" name="value" type="xs:string"/>
+						
+        </xs:sequence>
+					
+      </xs:extension>
+				
+    </xs:complexContent>
+			
+  </xs:complexType>
+
+			
+  <xs:complexType name="iBeaconValue">
+				
+    <xs:complexContent>
+					
+      <xs:extension base="tns:datapointValue">
+						
+        <xs:sequence>
+							
+          <xs:element minOccurs="0" name="btaddr" type="xs:string"/>
+							
+          <xs:element name="major" type="xs:int"/>
+							
+          <xs:element name="maxratio" type="xs:decimal"/>
+							
+          <xs:element name="minor" type="xs:int"/>
+							
+          <xs:element name="range" type="xs:string"/>
+							
+          <xs:element name="uuid" type="xs:string"/>
+						
+        </xs:sequence>
+					
+      </xs:extension>
+				
+    </xs:complexContent>
+			
+  </xs:complexType>
+
+			
+  <xs:complexType name="scancode">
+				
+    <xs:complexContent>
+					
+      <xs:extension base="tns:datapointValue">
+						
+        <xs:sequence>
+							
+          <xs:element maxOccurs="1" minOccurs="1" name="scannerId" nillable="false" type="xs:string"/>
+							
+          <xs:element maxOccurs="1" minOccurs="1" name="barcode" nillable="false" type="xs:string"/>
+						
+        </xs:sequence>
+					
+      </xs:extension>
+				
+    </xs:complexContent>
+			
+  </xs:complexType>
+
+			
+  <xs:complexType name="queryForEvents">
+				
+    <xs:sequence>
+					
+      <xs:element maxOccurs="unbounded" name="machineIdentifiers" type="tns:machineIdentifier"/>
+					
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="eventFilter" nillable="true" type="tns:eventFilter"/>
+					
+      <xs:element minOccurs="0" name="fromTimestamp" nillable="true" type="xs:long"/>
+					
+      <xs:element minOccurs="0" name="toTimestamp" nillable="true" type="xs:long"/>
+				
+    </xs:sequence>
+			
+  </xs:complexType>
+
+			
+  <xs:complexType abstract="true" name="machineIdentifier">
+				
+    <xs:sequence/>
+			
+  </xs:complexType>
+
+			
+  <xs:complexType name="kaercherMachineIdentifier">
+				
+    <xs:complexContent>
+					
+      <xs:extension base="tns:machineIdentifier">
+						
+        <xs:sequence>
+							
+          <xs:element minOccurs="0" name="localAddress" nillable="true" type="xs:string"/>
+							
+          <xs:element minOccurs="0" name="materialNumber" nillable="true" type="xs:string"/>
+							
+          <xs:element minOccurs="0" name="serialNumber" nillable="true" type="xs:string"/>
+						
+        </xs:sequence>
+					
+      </xs:extension>
+				
+    </xs:complexContent>
+			
+  </xs:complexType>
+
+			
+  <xs:complexType name="thirdPartyMachineIdentifier">
+				
+    <xs:complexContent>
+					
+      <xs:extension base="tns:machineIdentifier">
+						
+        <xs:sequence>
+							
+          <xs:element minOccurs="0" name="identifier" type="xs:string"/>
+						
+        </xs:sequence>
+					
+      </xs:extension>
+				
+    </xs:complexContent>
+			
+  </xs:complexType>
+
+			
+  <xs:complexType name="eventFilter">
+				
+    <xs:sequence>
+					
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="categories" nillable="true" type="xs:string"/>
+					
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="eventCodes" nillable="true" type="xs:unsignedInt"/>
+					
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="priorities" nillable="true" type="xs:int"/>
+					
+      <xs:element minOccurs="0" name="risingSlope" nillable="true" type="xs:boolean"/>
+				
+    </xs:sequence>
+			
+  </xs:complexType>
+
+			
+  <xs:complexType name="queryForEventsResponse">
+				
+    <xs:sequence>
+					
+      <xs:element minOccurs="0" name="return" type="tns:eventQueryResponse"/>
+				
+    </xs:sequence>
+			
+  </xs:complexType>
+
+			
+  <xs:complexType name="eventQueryResponse">
+				
+    <xs:sequence>
+					
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="machineEventQueryResponse" nillable="true" type="tns:machineEventQueryResponse"/>
+					
+      <xs:element minOccurs="0" name="timestampToken" type="xs:long"/>
+				
+    </xs:sequence>
+			
+  </xs:complexType>
+
+			
+  <xs:complexType name="machineEventQueryResponse">
+				
+    <xs:sequence>
+					
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="events" nillable="true" type="tns:event"/>
+					
+      <xs:element minOccurs="0" name="machineIdentifier" type="tns:machineIdentifier"/>
+				
+    </xs:sequence>
+			
+  </xs:complexType>
+
+			
+  <xs:complexType name="queryForLastData">
+				
+    <xs:sequence>
+					
+      <xs:element maxOccurs="unbounded" name="machineIdentifiers" type="tns:machineIdentifier"/>
+					
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="datapoints" nillable="true" type="xs:string"/>
+				
+    </xs:sequence>
+			
+  </xs:complexType>
+
+			
+  <xs:complexType name="queryForLastDataResponse">
+				
+    <xs:sequence>
+					
+      <xs:element minOccurs="0" name="return" type="tns:dataQueryResponse"/>
+				
+    </xs:sequence>
+			
+  </xs:complexType>
+
+			
+  <xs:complexType name="dataQueryResponse">
+				
+    <xs:sequence>
+					
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="machineDataQueryResponses" nillable="true" type="tns:machineDataQueryResponse"/>
+					
+      <xs:element minOccurs="0" name="timestampToken" type="xs:long"/>
+				
+    </xs:sequence>
+			
+  </xs:complexType>
+
+			
+  <xs:complexType name="machineDataQueryResponse">
+				
+    <xs:sequence>
+					
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="datapoints" nillable="true" type="tns:datapoint"/>
+					
+      <xs:element minOccurs="0" name="machineIdentifier" type="tns:machineIdentifier"/>
+				
+    </xs:sequence>
+			
+  </xs:complexType>
+
+			
+  <xs:complexType name="queryForData">
+				
+    <xs:sequence>
+					
+      <xs:element maxOccurs="unbounded" name="machineIdentifiers" type="tns:machineIdentifier"/>
+					
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="datapoints" nillable="true" type="xs:string"/>
+					
+      <xs:element minOccurs="0" name="fromTimestamp" nillable="true" type="xs:long"/>
+					
+      <xs:element minOccurs="0" name="toTimestamp" nillable="true" type="xs:long"/>
+				
+    </xs:sequence>
+			
+  </xs:complexType>
+
+			
+  <xs:complexType name="queryForDataResponse">
+				
+    <xs:sequence>
+					
+      <xs:element minOccurs="0" name="return" type="tns:dataQueryResponse"/>
+				
+    </xs:sequence>
+			
+  </xs:complexType>
+
+		
+</xs:schema>
+  </wsdl:types>
+  <wsdl:message name="queryForEventsResponse">
+    <wsdl:part element="tns:queryForEventsResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="queryForLastData">
+    <wsdl:part element="tns:queryForLastData" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="queryForDataResponse">
+    <wsdl:part element="tns:queryForDataResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="queryForData">
+    <wsdl:part element="tns:queryForData" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getEventById">
+    <wsdl:part element="tns:getEventById" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getEventByIdResponse">
+    <wsdl:part element="tns:getEventByIdResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="queryForEvents">
+    <wsdl:part element="tns:queryForEvents" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="queryForLastDataResponse">
+    <wsdl:part element="tns:queryForLastDataResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="DataWebService">
+    <wsdl:operation name="getEventById">
+      <wsdl:input message="tns:getEventById" name="getEventById">
+    </wsdl:input>
+      <wsdl:output message="tns:getEventByIdResponse" name="getEventByIdResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="queryForEvents">
+      <wsdl:input message="tns:queryForEvents" name="queryForEvents">
+    </wsdl:input>
+      <wsdl:output message="tns:queryForEventsResponse" name="queryForEventsResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="queryForLastData">
+      <wsdl:input message="tns:queryForLastData" name="queryForLastData">
+    </wsdl:input>
+      <wsdl:output message="tns:queryForLastDataResponse" name="queryForLastDataResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="queryForData">
+      <wsdl:input message="tns:queryForData" name="queryForData">
+    </wsdl:input>
+      <wsdl:output message="tns:queryForDataResponse" name="queryForDataResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="DataWebServiceSoapBinding" type="tns:DataWebService">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="getEventById">
+      <soap:operation soapAction="getEventById" style="document"/>
+      <wsdl:input name="getEventById">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getEventByIdResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="queryForEvents">
+      <soap:operation soapAction="queryForEvents" style="document"/>
+      <wsdl:input name="queryForEvents">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="queryForEventsResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="queryForLastData">
+      <soap:operation soapAction="queryForLastData" style="document"/>
+      <wsdl:input name="queryForLastData">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="queryForLastDataResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="queryForData">
+      <soap:operation soapAction="queryForData" style="document"/>
+      <wsdl:input name="queryForData">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="queryForDataResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="DataWebService">
+    <wsdl:port binding="tns:DataWebServiceSoapBinding" name="DataWebServicePort">
+      <soap:address location="https://hackathon.app.kaercher.com/soap/v18/data"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
