@@ -14,3 +14,19 @@ nav .brand-logo {
 nav ul a {
     color: #474540;
 }
+
+nav .button-collapse i {
+    height: 56px;
+    line-height: 56px;
+    color: #474540;
+}
+
+body {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+}
+
+main {
+    flex: 1 0 auto;
+}

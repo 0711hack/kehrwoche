@@ -22,56 +22,68 @@
        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/js/materialize.min.js"></script>
   </head>
   <body>
-      
+  <header>
   <nav>
     <div class="nav-wrapper">
       <a href="#!" class="brand-logo center">Kehrwoch as a Service</a>
+        <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
       <ul class="left hide-on-med-and-down">
         <li class="active"><a href="index.html">Anlegen</a></li>
         <li><a href="orders.html">Aufträge</a></li>
-        <li><a href="messages.html">Nachrichten</a></li>
       </ul>
+        <ul class="side-nav" id="mobile-demo">
+            <li class="active"><a href="index.html">Anlegen</a></li>
+            <li><a href="orders.html">Aufträge</a></li>
+        </ul>
     </div>
   </nav>
+
+  </header>
+  <main>
+
+
+
+
         <!-- Page Content goes here -->
-      <div class="container" style="height: 350px; margin-top:20px;" class="z-depth-2">
+      <div class="container" style="height: 100%; margin-top:10px;" class="z-depth-2">
           <div class="row">
-              <div class="col s12" style="margin-top: 10px;">
-                 <h5>Please select a cleaning area.</h5>
+              <div class="col s12 m12">
+                  <div class="card grey lighten-5">
+                      <div class="card-content">
+                          <span class="card-title">Please select a cleaning area.</span>
+                          <div id="map" style="height: 350px"></div>
+                          <div>
+                      </div>
+                      <div class="card-action">
+                          <button id="submitRequest" class="btn waves-effect waves-light" style="background-color: #ffed00; color: #000;" name="action">Clean
+                          </button>
+                      </div>
+                  </div>
               </div>
           </div>
-          <div id="map" style="height: 300px" class="z-depth-2"></div>
-          <div>
-         <div class="row">
-             <div class="col s2 offset-s10" style="margin-top: 30px;">
-                 <button id="submitRequest" class="btn waves-effect waves-light" style="background-color: #ffed00; color: #000;" name="action">Clean
-                 </button>
-
-             </div>
-          </div> 
+          </div>
       </div>
-
-
-
-          <div id="modal1" class="modal bottom-sheet">
-              <div class="modal-content">
-                  <h4>Modal Header</h4>
-                  <p>A bunch of text</p>
+  </main>
+          <footer class="page-footer" style="background-color: #ffed00">
+              <div class="footer-copyright">
+                  <div class="container" style="color: #474540">
+                      © 2016 by Kehrwoche as a Service
+                      <a class="grey-text text-darken-4 right" href="https://github.com/0711hack/kehrwoche" style="color: #474540">0711hack</a>
+                  </div>
               </div>
-              <div class="modal-footer">
-                  <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Agree</a>
-              </div>
-          </div>
-      
-    
-    <script>
+          </footer>
+
+
+
+          <script>
 // This example adds a user-editable rectangle to the map.
 // When the user changes the bounds of the rectangle,
 // an info window pops up displaying the new bounds.
 
 var rectangle;
 var map;
-var infoWindow;
+var line;
+var lineSymbol;
 
 $(document).ready(function(){
     // the "href" attribute of .modal-trigger must specify the modal ID that wants to be triggered
@@ -103,25 +115,73 @@ function initMap() {
   // Add an event listener on the rectangle.
   rectangle.addListener('bounds_changed', showNewRect);
 
-  // Define an info window on the map.
-  infoWindow = new google.maps.InfoWindow();
+     lineSymbol = {
+        path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
+        scale: 7,
+        strokeColor: '#ffed00',
+        rotation: 180
+
+    };
+
+
+    // Define an info window on the map.
+  //infoWindow = new google.maps.InfoWindow();
+    line =  new google.maps.Polyline({
+        path: [{lat: 48.81542, lng: 9.212489}, {lat: 48.81542, lng: 9.212300},{lat: 48.81522, lng: 9.212300},{lat: 48.81522, lng: 9.212489}, {lat: 48.81542, lng: 9.212489}],
+        icons: [{
+            icon: lineSymbol,
+            offset: '100%'
+        }],
+        map: map
+    });
+
 }
 // Show the new coordinates for the rectangle in an info window.
 
+function animateCircle(line) {
+    var count = 0;
+    window.setInterval(function() {
+        count = (count + 1) % 200;
+        var icons = line.get('icons');
+        icons[0].offset = (count / 2) + '%';
+        line.set('icons', icons);
+    }, 20);
+}
+
 /** @this {google.maps.Rectangle} */
 function showNewRect(event) {
-  var ne = rectangle.getBounds().getNorthEast();
-  var sw = rectangle.getBounds().getSouthWest();
-  var nw = rectangle.getBounds().getNorthWest();
-  var se = rectangle.getBounds().getSouthEast();
-    
-  var contentString = '<b>Rectangle moved.</b><br>' +
-      'New north-east corner: ' + ne.lat() + ', ' + ne.lng() + '<br>' +
-      'New south-west corner: ' + sw.lat() + ', ' + sw.lng();
+    var bounds = rectangle.getBounds();
+    var ne = {};
+    ne['long'] = bounds.getNorthEast().lng();
+    ne['lat'] = bounds.getNorthEast().lat();
+    var se = {};
+    se['long'] = bounds.getSouthWest().lng();
+    se['lat'] = bounds.getNorthEast().lat();
+    var sw = {};
+    sw['long'] = bounds.getSouthWest().lng();
+    sw['lat'] = bounds.getSouthWest().lat();
 
-  // Set the info window's content and position.
-  infoWindow.setContent(contentString);
-  infoWindow.setPosition(ne);
+    var nw = {};
+    nw['long'] = bounds.getNorthEast().lng();
+    nw['lat'] = bounds.getSouthWest().lat();
+    // Array
+    line.setMap(null);
+    line =  new google.maps.Polyline({
+        path: [{lat: parseFloat(ne.lat), lng: parseFloat(ne.lng)},
+            {lat: parseFloat(se.lat), lng: parseFloat(se.lng)},
+            {lat: parseFloat(sw.lat), lng: parseFloat(sw.lng)},
+            {lat: parseFloat(nw.lat), lng: parseFloat(nw.lng)},
+            {lat: parseFloat(ne.lat), lng: parseFloat(ne.lng)}],
+        icons: [{
+            icon: lineSymbol,
+            offset: '100%'
+        }],
+        strokeWeight: 2,
+        strokeColor: '#FF0000',
+        map: map
+
+    });
+    line.setMap(map);
 
   //infoWindow.open(map);
 }
@@ -135,8 +195,11 @@ $("#submitRequest").click(function() {
         data: formToJSON(),
         success: function(data, textStatus, jqXHR){
             console.log('created' + data);
-            alert('Request created'
-                 + JSON.stringify(data));
+           // alert('Request created'
+             //    + JSON.stringify(data));
+            animateCircle(line);
+
+
         },
         error: function(jqXHR, textStatus, errorThrown){
              console.log('failed' +  errorThrown);
@@ -175,13 +238,18 @@ $("#submitRequest").click(function() {
             nw['lat'] = bounds.getSouthWest().lat();
             // Array
             result['points'].push(nw);
-            console.log(JSON.stringify(result));
+
             return JSON.stringify(result);
         };
 
 
 
+// Create the polyline and add the symbol to it via the 'icons' property.
 
+
+
+
+$(".button-collapse").sideNav();
 
     </script>
 
