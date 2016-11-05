@@ -7,6 +7,8 @@ var Q = require('q');
 AWS.config.setPromisesDependency(Q.Promise);
 var awsRegion = process.env.AWS_REGION;
 
+var dynamo = {};
+
 var soap = require('soap');
 // var url = 'https://hackathon.app.kaercher.com/soap/v18/data?wsdl';
 var url = 'data.wsdl';
@@ -24,8 +26,13 @@ function getEvents(events, fromTime) {
       attributes: {
         "xsi:type": "tns:kaercherMachineIdentifier"
       },
-      materialNumber: '1.999-260.0',
-      serialNumber: '000100'
+      // Koffer
+      // materialNumber: '1.999-260.0',
+      // serialNumber: '000100'
+      
+      // Kehrmaschine
+      materialNumber: '1.280-150.2',
+      serialNumber: '000116'
     },
     eventFilter: {
       eventCodes: 2000
@@ -76,56 +83,43 @@ function parseEvent(event) {
   return res;
 }
 
-function collectEvents(events) {
-  var res = {};
-  events.forEach(function (ev) {
-    if (!res[ev.area]) {
-      res[ev.area] = [];
-    }
-    res[ev.area].push({enter: ev.enter, time: ev.time});
-  });
-  return res;
+function handleEvents(events) {
+  var start = {events: events, sessions: []};
+  return Q.resolve(start).then(handleSessionEvent);
 }
 
-function collectSessions(events) {
-  var sessions = [];
-  for (var index in events) {
-    if (events.hasOwnProperty(index)) {
-      var evs = events[index];
-      var currentSession;
-      evs.forEach(function (ev) {
-        if (ev.enter) {
-          currentSession = {id: index, start: ev.time};
-        } else {
-          if (currentSession) {
-            currentSession.end = ev.time;
-            sessions.push(currentSession);
-            currentSession = undefined;
-          }
-        }
-      });
-    }
+function handleSessionEvent(ctx) {
+  if (ctx.events.length === 0) {
+    return ctx.sessions;
   }
-  return sessions;
+  var event = ctx.events[0];
+  ctx.events = ctx.events.slice(1);
+  if (event.enter) {
+    return handleStartSession(ctx, event).then(handleSessionEvent);
+  }
+  return handleEndSession(ctx, event).then(handleSessionEvent);
 }
 
-function calcBilling(sessions) {
-  var res = {};
-  
-  sessions.forEach(function (session) {
-    if (!res[session.id]) {
-      res[session.id] = [];
-    }
-    var duration = (session.end - session.start) / 1000 / 3600;
+
+function handleStartSession(ctx, event) {
+  dynamo[event.area] = {start: event.time};
+  console.log('Handle start', event);
+  return Q.resolve(ctx);
+}
+
+function handleEndSession(ctx, event) {
+  if (dynamo[event.area]) {
+    var state = dynamo[event.area];
+    var duration = (event.time - state.start) / 1000 / 3600;
     var cost = duration * price;
-    res[session.id].push({start: session.start, end: session.end, duration: duration, cost: cost});
-  });
-  
-  return res;
+    ctx.sessions.push({area: event.area, start: state.start, end: event.time, duration: duration, cost: cost});
+    delete dynamo[event.area];
+  }
+  return Q.resolve(ctx);
 }
 
-function sendBilling(billings) {
-  return billings;
+function sendBilling(sessions) {
+  return sessions;
 }
 
 exports.handler = function (event, context, callback) {
@@ -133,9 +127,7 @@ exports.handler = function (event, context, callback) {
   
   getEvents([], 0)
     .then(parseEvents)
-    .then(collectEvents)
-    .then(collectSessions)
-    .then(calcBilling)
+    .then(handleEvents)
     .then(sendBilling)
     .then(function (events) {
       callback(null, events);
