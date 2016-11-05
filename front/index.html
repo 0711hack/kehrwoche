@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Drawing tools</title>
+    <title>Kehrwoch as a Service</title>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
     <style>
@@ -16,7 +16,7 @@
     </style>
     <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/css/materialize.min.css">
-     
+      <link rel="stylesheet" href="style.css">
   <!-- Compiled and minified JavaScript -->
        <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/js/materialize.min.js"></script>
@@ -25,9 +25,9 @@
       
   <nav>
     <div class="nav-wrapper">
-      <a href="#!" class="brand-logo center">Cleaning as a Service</a>
+      <a href="#!" class="brand-logo center">Kehrwoch as a Service</a>
       <ul class="left hide-on-med-and-down">
-        <li class="active"><a href="sass.html">Anlegen</a></li>
+        <li class="active"><a href="index.html">Anlegen</a></li>
         <li><a href="orders.html">Aufträge</a></li>
         <li><a href="messages.html">Nachrichten</a></li>
       </ul>
@@ -35,22 +35,33 @@
   </nav>
         <!-- Page Content goes here -->
       <div class="container" style="height: 350px; margin-top:20px;" class="z-depth-2">
-        <div id="map" style="height: 300px"></div>
+          <div class="row">
+              <div class="col s12" style="margin-top: 10px;">
+                 <h5>Please select a cleaning area.</h5>
+              </div>
+          </div>
+          <div id="map" style="height: 300px" class="z-depth-2"></div>
           <div>
          <div class="row">
-            <form class="col s12">
-              <div class="row">
-                <button id="submitRequest" class="btn waves-effect waves-light"  name="action">Clean
-                    </button>
-                  </div>
-              </div>
-            </form>
+             <div class="col s2 offset-s10" style="margin-top: 30px;">
+                 <button id="submitRequest" class="btn waves-effect waves-light" style="background-color: #ffed00; color: #000;" name="action">Clean
+                 </button>
+
+             </div>
           </div> 
       </div>
-      
-  
-     
-      
+
+
+
+          <div id="modal1" class="modal bottom-sheet">
+              <div class="modal-content">
+                  <h4>Modal Header</h4>
+                  <p>A bunch of text</p>
+              </div>
+              <div class="modal-footer">
+                  <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Agree</a>
+              </div>
+          </div>
       
     
     <script>
@@ -61,6 +72,11 @@
 var rectangle;
 var map;
 var infoWindow;
+
+$(document).ready(function(){
+    // the "href" attribute of .modal-trigger must specify the modal ID that wants to be triggered
+    $('.modal').modal();
+});
 
 function initMap() {
   map = new google.maps.Map(document.getElementById('map'), {
@@ -124,7 +140,7 @@ $("#submitRequest").click(function() {
         },
         error: function(jqXHR, textStatus, errorThrown){
              console.log('failed' +  errorThrown);
-            alert('addWine error: ' + textStatus);
+            alert('Error: ' + textStatus);
         }
     });
     return false;
@@ -162,6 +178,9 @@ $("#submitRequest").click(function() {
             console.log(JSON.stringify(result));
             return JSON.stringify(result);
         };
+
+
+
 
 
     </script>
