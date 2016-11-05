@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='UTF-8'?><wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://command.tdms.kaercher.com/CommandWebService" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ns2="http://schemas.xmlsoap.org/soap/http" xmlns:ns1="http://query.tdms.kaercher.com/CommandWebService" name="CommandWebServiceImplService" targetNamespace="http://command.tdms.kaercher.com/CommandWebService">
+  <wsdl:import location="http://hackathon.app.kaercher.com/soap/v18/command?wsdl=CommandWebService.wsdl" namespace="http://query.tdms.kaercher.com/CommandWebService">
+    </wsdl:import>
+  <wsdl:binding name="CommandWebServiceImplServiceSoapBinding" type="ns1:CommandWebService">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="sendCommand">
+      <soap:operation soapAction="sendCommand" style="document"/>
+      <wsdl:input name="sendCommand">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="sendCommandResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getCommunicationStatus">
+      <soap:operation soapAction="getCommunicationStatus" style="document"/>
+      <wsdl:input name="getCommunicationStatus">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getCommunicationStatusResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="CommandWebServiceImplService">
+    <wsdl:port binding="tns:CommandWebServiceImplServiceSoapBinding" name="CommandWebServicePort">
+      <soap:address location="http://hackathon.app.kaercher.com/soap/v18/command"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
