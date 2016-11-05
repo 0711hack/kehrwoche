@@ -15,12 +15,11 @@
       }
     </style>
     <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/css/materialize.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/css/materialize.min.css">
      
   <!-- Compiled and minified JavaScript -->
        <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/js/materialize.min.js"></script>
-
+       <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/js/materialize.min.js"></script>
   </head>
   <body>
       
@@ -29,35 +28,24 @@
       <a href="#!" class="brand-logo center">Cleaning as a Service</a>
       <ul class="left hide-on-med-and-down">
         <li class="active"><a href="sass.html">Anlegen</a></li>
-        <li><a href="badges.html">Aufträge</a></li>
-        <li><a href="collapsible.html">Nachrichten</a></li>
+        <li><a href="orders.html">Aufträge</a></li>
+        <li><a href="messages.html">Nachrichten</a></li>
       </ul>
     </div>
   </nav>
         <!-- Page Content goes here -->
       <div class="container" style="height: 350px; margin-top:20px;" class="z-depth-2">
-          
-  <div class="row">
-    <form class="col s12">
-      <div class="row">
-        <div class="input-field col s6">
-          <i class="material-icons prefix">account_circle</i>
-          <input id="icon_prefix" type="text" class="validate">
-          <label for="icon_prefix">Name</label>
-        </div>
-        <div class="input-field col s6">
-          <i class="material-icons prefix">phone</i>
-          <input id="icon_telephone" type="tel" class="validate">
-          <label for="icon_telephone">Telefon</label>
-        </div>
-      </div>
-    </form>
-  </div>
         <div id="map" style="height: 300px"></div>
           <div>
-          <button class="btn waves-effect waves-light" type="submit" name="action">Clean
-            </button>
-          </div>
+         <div class="row">
+            <form class="col s12">
+              <div class="row">
+                <button id="submitRequest" class="btn waves-effect waves-light" type="submit" name="action">Clean
+                    </button>
+                  </div>
+              </div>
+            </form>
+          </div> 
       </div>
       
   
@@ -66,54 +54,116 @@
       
     
     <script>
+// This example adds a user-editable rectangle to the map.
+// When the user changes the bounds of the rectangle,
+// an info window pops up displaying the new bounds.
+
+var rectangle;
+var map;
+var infoWindow;
+
 function initMap() {
-  var map = new google.maps.Map(document.getElementById('map'), {
+  map = new google.maps.Map(document.getElementById('map'), {
     center: {lat: 48.81532, lng: 9.212395},
-    zoom: 20
+    zoom: 19
   });
 
-  var drawingManager = new google.maps.drawing.DrawingManager({
-    drawingMode: google.maps.drawing.OverlayType.MARKER,
-    drawingControl: true,
-    drawingControlOptions: {
-      position: google.maps.ControlPosition.TOP_CENTER,
-      drawingModes: [
-        google.maps.drawing.OverlayType.RECTANGLE,
-      ]
-    },
-    markerOptions: {icon: 'images/beachflag.png'},
-    circleOptions: {
-      fillColor: '#ffff00',
-      fillOpacity: 1,
-      strokeWeight: 5,
-      clickable: false,
-      editable: true,
-      zIndex: 1
-    }
+  var bounds = {
+    north: 48.81542,
+    south: 48.81522,
+    east: 9.212489,
+    west: 9.212300
+  };
+
+  // Define the rectangle and set its editable property to true.
+  rectangle = new google.maps.Rectangle({
+    bounds: bounds,
+    editable: true,
+    draggable: true
   });
-    function overlayClickListener(overlay) {
-    google.maps.event.addListener(overlay, "mouseup", function(event){
-        val(overlay.getPath().getArray());
-    });
-    } 
-    google.maps.event.addListener(drawingManager, "overlaycomplete", function(event){
-                overlayClickListener(event.overlay);
-                //$('#vertices').val(event.overlay.getPath().getArray());
-            /**      console.log(event.overlay.getPath().getArray());
-        
-       vertices = event.overlay.getPath();
-         var contentString = '';
-       for (var i =0; i < vertices.getLength(); i++) {
-           var xy = vertices.getAt(i);
-         contentString += '<br>' + 'Coordinate ' + i + ':<br>' + xy.lat() + ',' +xy.lng();*/
-           
-  }
-console.log(contentString);
-    });
-  drawingManager.setMap(map);
+
+  rectangle.setMap(map);
+
+  // Add an event listener on the rectangle.
+  rectangle.addListener('bounds_changed', showNewRect);
+
+  // Define an info window on the map.
+  infoWindow = new google.maps.InfoWindow();
 }
+// Show the new coordinates for the rectangle in an info window.
+
+/** @this {google.maps.Rectangle} */
+function showNewRect(event) {
+  var ne = rectangle.getBounds().getNorthEast();
+  var sw = rectangle.getBounds().getSouthWest();
+  var nw = rectangle.getBounds().getNorthWest();
+  var se = rectangle.getBounds().getSouthEast();
+    
+  var contentString = '<b>Rectangle moved.</b><br>' +
+      'New north-east corner: ' + ne.lat() + ', ' + ne.lng() + '<br>' +
+      'New south-west corner: ' + sw.lat() + ', ' + sw.lng();
+
+  // Set the info window's content and position.
+  infoWindow.setContent(contentString);
+  infoWindow.setPosition(ne);
+
+  //infoWindow.open(map);
+}
+        
+$("#submitRequest").click(function() {
+    $.ajax({
+        type: 'POST',
+        contentType: 'application/json',
+        url: 'https://3mo44ocomk.execute-api.eu-west-1.amazonaws.com/dev/geofence/',
+        dataType: "json",
+        data: formToJSON(),
+        success: function(data, textStatus, jqXHR){
+            console.log('created' + data);
+            alert('Request created');
+        },
+        error: function(jqXHR, textStatus, errorThrown){
+             console.log('failed' +  errorThrown);
+            alert('addWine error: ' + textStatus);
+        }
+    });
+});
+        
+        function formToJSON() {
+            var bounds = rectangle.getBounds();
+            
+            var result = {};           // Object
+            result['id'] = '12345';
+            result['position'] = []; 
+            var ne = {};
+            ne['long'] = bounds.getNorthEast().lng();
+            ne['lat'] = bounds.getNorthEast().lat();
+            result['position'].push(ne);
+            // Array
+            var se = {};
+            se['long'] = bounds.getSouthWest().lng();
+            se['lat'] = bounds.getNorthEast().lat();
+            // Array
+            result['position'].push(se);
+            
+            
+             var sw = {};
+            sw['long'] = bounds.getSouthWest().lng();
+            sw['lat'] = bounds.getSouthWest().lat();
+            // Array
+            result['position'].push(sw);
+            
+            var nw = {};
+            nw['long'] = bounds.getNorthEast().lng();
+            nw['lat'] = bounds.getSouthWest().lat();
+            // Array
+            result['position'].push(nw);
+            console.log(JSON.stringify(result));
+            return JSON.stringify(result);
+        };
+
 
     </script>
+
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCOF2PNis-bVxQ43q11KB3XzWCeqDSkeCY&signed_in=true&libraries=drawing&callback=initMap"
          async defer></script>
   </body>
