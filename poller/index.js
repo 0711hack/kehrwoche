@@ -80,7 +80,7 @@ function parseEvent(event) {
   });
   res.enter = !event.risingEdge;
   res.time = new Date(event.timestamp).getTime();
-  console.log('Event', res);
+  console.log('Event', res, new Date(event.timestamp));
   return res;
 }
 
