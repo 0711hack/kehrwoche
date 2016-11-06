@@ -1,3 +1,4 @@
 api/node_modules/
 api/.serverless/
+front/.idea/
 poller/node/modules/
