@@ -8,7 +8,7 @@ var dateFormat = require('dateformat');
 AWS.config.setPromisesDependency(Q.Promise);
 var awsRegion = process.env.AWS_REGION;
 
-var docClient = new AWS.DynamoDB.DocumentClient({region: awsRegion, endpoint: 'http://localhost:8000'});
+var docClient = new AWS.DynamoDB.DocumentClient({region: awsRegion});
 var ses = new AWS.SES({region: awsRegion});
 
 var soap = require('soap');
@@ -28,10 +28,6 @@ function getEvents(events, fromTime) {
       attributes: {
         "xsi:type": "tns:kaercherMachineIdentifier"
       },
-      // Koffer
-      // materialNumber: '1.999-260.0',
-      // serialNumber: '000100'
-      
       // Kehrmaschine
       materialNumber: '1.280-150.2',
       serialNumber: '000116'

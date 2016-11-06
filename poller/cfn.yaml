@@ -4,6 +4,19 @@ Parameters:
   Version:
     Type: String
 Resources:
+  EventsTable:
+    Type: "AWS::DynamoDB::Table"
+    Properties:
+      TableName: "KehrwocheEvents"
+      KeySchema:
+        - AttributeName: "area"
+          KeyType: "HASH"
+      AttributeDefinitions:
+        - AttributeName: "area"
+          AttributeType: "S"
+      ProvisionedThroughput:
+        ReadCapacityUnits: "1"
+        WriteCapacityUnits: "1"
   FunctionRole:
     Type: 'AWS::IAM::Role'
     Properties:
@@ -28,6 +41,10 @@ Resources:
                 Action:
                   - 'ses:*'
                 Resource: '*'
+              - Effect: Allow
+                Action:
+                  - 'dynamodb:*'
+                Resource: !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::Account}:table/${EventsTable}
   Function:
     Type: 'AWS::Lambda::Function'
     Properties:
