@@ -7,6 +7,8 @@ var Q = require('q');
 AWS.config.setPromisesDependency(Q.Promise);
 var awsRegion = process.env.AWS_REGION;
 
+var docClient = new AWS.DynamoDB.DocumentClient({region: awsRegion, endpoint: 'http://localhost:8000'});
+
 var soap = require('soap');
 // var url = 'https://hackathon.app.kaercher.com/soap/v18/data?wsdl';
 var url = 'data.wsdl';
@@ -24,8 +26,13 @@ function getEvents(events, fromTime) {
       attributes: {
         "xsi:type": "tns:kaercherMachineIdentifier"
       },
-      materialNumber: '1.999-260.0',
-      serialNumber: '000100'
+      // Koffer
+      // materialNumber: '1.999-260.0',
+      // serialNumber: '000100'
+      
+      // Kehrmaschine
+      materialNumber: '1.280-150.2',
+      serialNumber: '000116'
     },
     eventFilter: {
       eventCodes: 2000
@@ -72,70 +79,87 @@ function parseEvent(event) {
     }
   });
   res.enter = !event.risingEdge;
-  res.time = new Date(event.timestamp);
+  res.time = new Date(event.timestamp).getTime();
+  console.log('Event', res, new Date(event.timestamp));
   return res;
 }
 
-function collectEvents(events) {
-  var res = {};
-  events.forEach(function (ev) {
-    if (!res[ev.area]) {
-      res[ev.area] = [];
-    }
-    res[ev.area].push({enter: ev.enter, time: ev.time});
-  });
-  return res;
+function handleEvents(events) {
+  var start = {events: events, sessions: []};
+  return Q.resolve(start).then(handleSessionEvent);
 }
 
-function collectSessions(events) {
-  var sessions = [];
-  for (var index in events) {
-    if (events.hasOwnProperty(index)) {
-      var evs = events[index];
-      var currentSession;
-      evs.forEach(function (ev) {
-        if (ev.enter) {
-          currentSession = {id: index, start: ev.time};
-        } else {
-          if (currentSession) {
-            currentSession.end = ev.time;
-            sessions.push(currentSession);
-            currentSession = undefined;
-          }
-        }
-      });
-    }
+function handleSessionEvent(ctx) {
+  if (ctx.events.length === 0) {
+    return ctx.sessions;
   }
+  var event = ctx.events[0];
+  ctx.events = ctx.events.slice(1);
+  if (event.enter) {
+    return handleStartSession(ctx, event).then(handleSessionEvent);
+  }
+  return handleEndSession(ctx, event).then(handleSessionEvent);
+}
+
+
+function handleStartSession(ctx, event) {
+  var params = {
+    TableName: 'KehrwocheEvents',
+    Item: {
+      "area": event.area,
+      "start": event.time
+    }
+  };
+  return docClient.put(params).promise().then(function (res) {
+    return ctx;
+  });
+}
+
+function handleEndSession(ctx, event) {
+  var params = {
+    TableName: 'KehrwocheEvents',
+    Key: {
+      "area": event.area
+    }
+  };
+  
+  return docClient.get(params).promise().then(function (data) {
+    var state = data.Item;
+    if (!state) {
+      return ctx;
+    }
+    var duration = (event.time - state.start) / 1000 / 3600;
+    var cost = duration * price;
+    
+    var session = {
+      area: event.area,
+      start: new Date(state.start),
+      startTime: state.start,
+      end: new Date(event.time),
+      endTime: event.time,
+      duration: duration,
+      cost: cost
+    };
+    ctx.sessions.push(session);
+    return docClient.delete(params).promise().then(function (res) {
+      return ctx;
+    });
+  }, function (err) {
+    console.log('Error or get or delete', err);
+    return ctx;
+  });
+}
+
+function sendBilling(sessions) {
   return sessions;
 }
 
-function calcBilling(sessions) {
-  var res = {};
-  
-  sessions.forEach(function (session) {
-    if (!res[session.id]) {
-      res[session.id] = [];
-    }
-    var duration = (session.end - session.start) / 1000 / 3600;
-    var cost = duration * price;
-    res[session.id].push({start: session.start, end: session.end, duration: duration, cost: cost});
-  });
-  
-  return res;
-}
-
-function sendBilling(billings) {
-  return billings;
-}
-
 exports.handler = function (event, context, callback) {
-  console.log("INFO: Poller triggered");
+  console.log("INFO: Poller triggered from start " + parseInt(event.time));
   
-  getEvents([], 0)
+  getEvents([], parseInt(event.time))
     .then(parseEvents)
-    .then(collectEvents)
-    .then(collectSessions)
-    .then(calcBilling)
+    .then(handleEvents)
     .then(sendBilling)
     .then(function (events) {
       callback(null, events);
