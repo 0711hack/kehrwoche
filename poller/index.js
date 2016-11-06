@@ -4,10 +4,12 @@ var price = 40;
 
 var AWS = require('aws-sdk');
 var Q = require('q');
+var dateFormat = require('dateformat');
 AWS.config.setPromisesDependency(Q.Promise);
 var awsRegion = process.env.AWS_REGION;
 
 var docClient = new AWS.DynamoDB.DocumentClient({region: awsRegion, endpoint: 'http://localhost:8000'});
+var ses = new AWS.SES({region: awsRegion});
 
 var soap = require('soap');
 // var url = 'https://hackathon.app.kaercher.com/soap/v18/data?wsdl';
@@ -151,7 +153,45 @@ function handleEndSession(ctx, event) {
 }
 
 function sendBilling(sessions) {
-  return sessions;
+  var text = '<html><body><h1>Ihre Abrechnung zu Kehrwoche-as-a-Service</h1>';
+  text += '<table border="1" width="70%">';
+  text += '<tr><th width="40%">Start</th><th width="40%">Ende</th><th width="20%">Preis</th></tr>';
+  
+  var sum = 0;
+  sessions.forEach(function (sess) {
+    var cost = sess.cost.toFixed(2);
+    var start = dateFormat(sess.start, "dd.mm.yyyy hh:MM:ss");
+    var end = dateFormat(sess.end, "dd.mm.yyyy hh:MM:ss");
+    text += '<tr><td>' + start + '</td><td>' + end + '</td><td>' + cost + ' € </td></tr>';
+    sum += sess.cost;
+  });
+  text += '</table>';
+  text += '<br/>';
+  text += '<h3>Die Gesamtkosten belaufen sich auf: ' + sum.toFixed(2) + ' €</h3>';
+  text += '<p>Viele Grüße<br/>Ihr Kehrwoche-as-a-Service Team</p>';
+  text += '</body></html>';
+  
+  var params = {
+    Destination: {
+      ToAddresses: [
+        'thorsten.hoeger@taimos.de'
+      ]
+    },
+    Message: {
+      Body: {
+        Html: {
+          Data: text,
+          Charset: 'UTF-8'
+        }
+      },
+      Subject: {
+        Data: 'Kehrwoche-as-a-Service Abrechnung',
+        Charset: 'UTF-8'
+      }
+    },
+    Source: 'kehrwoche@taimos.de'
+  };
+  return ses.sendEmail(params).promise();
 }
 
 exports.handler = function (event, context, callback) {
