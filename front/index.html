@@ -113,7 +113,7 @@ function initMap() {
   rectangle.setMap(map);
 
   // Add an event listener on the rectangle.
-  rectangle.addListener('bounds_changed', showNewRect);
+ // rectangle.addListener('bounds_changed', showNewRect);
 
      lineSymbol = {
         path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
@@ -126,14 +126,7 @@ function initMap() {
 
     // Define an info window on the map.
   //infoWindow = new google.maps.InfoWindow();
-    line =  new google.maps.Polyline({
-        path: [{lat: 48.81542, lng: 9.212489}, {lat: 48.81542, lng: 9.212300},{lat: 48.81522, lng: 9.212300},{lat: 48.81522, lng: 9.212489}, {lat: 48.81542, lng: 9.212489}],
-        icons: [{
-            icon: lineSymbol,
-            offset: '100%'
-        }],
-        map: map
-    });
+
 
 }
 // Show the new coordinates for the rectangle in an info window.
@@ -149,7 +142,8 @@ function animateCircle(line) {
 }
 
 /** @this {google.maps.Rectangle} */
-function showNewRect(event) {
+function createLine() {
+    console.log("creates line for animation")
     var bounds = rectangle.getBounds();
     var ne = {};
     ne['long'] = bounds.getNorthEast().lng();
@@ -165,16 +159,21 @@ function showNewRect(event) {
     nw['long'] = bounds.getNorthEast().lng();
     nw['lat'] = bounds.getSouthWest().lat();
     // Array
-    var path = line.getPath();
-    path.clear();
-    path.push( new google.maps.LatLng(parseFloat(ne.lat)+0.02,parseFloat(ne.lng)));
-    path.push( new google.maps.LatLng(parseFloat(se.lat),parseFloat(se.lng)));
-    path.push( new google.maps.LatLng(parseFloat(sw.lat),parseFloat(sw.lng)));
-    path.push( new google.maps.LatLng(parseFloat(nw.lat),parseFloat(nw.lng)));
-    path.push( new google.maps.LatLng(parseFloat(ne.lat),parseFloat(ne.lng)));
-    line.setPath(path);
+    var thepath = [];
+    thepath.push( new google.maps.LatLng(parseFloat(ne.lat),parseFloat(ne.long)));
+    thepath.push( new google.maps.LatLng(parseFloat(se.lat),parseFloat(se.long)));
+    thepath.push( new google.maps.LatLng(parseFloat(sw.lat),parseFloat(sw.long)));
+    thepath.push( new google.maps.LatLng(parseFloat(nw.lat),parseFloat(nw.long)));
+    thepath.push( new google.maps.LatLng(parseFloat(ne.lat),parseFloat(ne.long)));
     //line.setMap(map);
-
+    line =  new google.maps.Polyline({
+        path: thepath,
+        icons: [{
+            icon: lineSymbol,
+            offset: '100%'
+        }],
+        map: map
+    });
   //infoWindow.open(map);
 }
         
@@ -187,6 +186,7 @@ $("#submitRequest").click(function() {
         data: formToJSON(),
         success: function(data, textStatus, jqXHR){
             console.log('created' + data);
+            createLine();
            // alert('Request created'
              //    + JSON.stringify(data));
             animateCircle(line);
